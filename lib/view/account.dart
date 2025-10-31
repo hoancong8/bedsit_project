@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:thuetro/model/account.dart';
+import 'package:thuetro/provider/home_provider.dart';
 
 import '../provider/auth_provider.dart';
 
 class Account extends ConsumerStatefulWidget {
   const Account({super.key});
-
   @override
   ConsumerState createState() => _AccountState();
 }
@@ -22,17 +22,37 @@ class _AccountState extends ConsumerState<Account> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 60),
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: NetworkImage(
-                    "https://kynguyenlamdep.com/wp-content/uploads/2022/08/anh-gai-xinh-che-mat-cuc-dep.jpg",
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  "Nguyễn Công Hoan",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+
+                ref.watch(loadAvatar).when(data: (data){
+                  return Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius:
+                        BorderRadius.circular(48),
+                        child: Container(
+                          width: 45,
+                          height: 45,
+                          color: Colors.blue,
+                          child: Image.network(
+                            data.avt ??
+                                "https://tse3.mm.bing.net/th/id/OIP.0eDamzEphB4k1QjbE9jAHwHaE7?pid=Api&P=0&h=180",
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.person_outlined);
+                            },),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        data.fullName??"Khách",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  );
+                }, error: (err, stack) => Center(child: Text("Lỗi: $err")),
+                  loading: () =>
+                  const Center(child: CircularProgressIndicator()),),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -178,7 +198,7 @@ class _AccountState extends ConsumerState<Account> {
           : Center(
               child: ElevatedButton(
                 onPressed: () {
-                  GoRouter.of(context).go("/");
+                  GoRouter.of(context).go('/sign_in');
                 },
                 child: Text("Đăng nhập"),
               ),

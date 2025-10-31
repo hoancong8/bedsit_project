@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:thuetro/provider/history_provider.dart';
 
 import '../../provider/home_provider.dart';
 import '../../utils/utils.dart';
@@ -53,6 +54,7 @@ class _ForyouState extends ConsumerState<Foryou> {
 
                     return InkWell(
                       onTap: () {
+                        ref.read(addHistory(post["id"]));
                         GoRouter.of(
                           context,
                         ).push('/detail', extra: post);

@@ -49,11 +49,11 @@ Future<void> toggleFavourite(String postId, bool isLiked) async {
 //get information user to SharedPreferences
 final loadAvatar = FutureProvider<AccountUsers>((ref) async {
   final prefs = await SharedPreferences.getInstance();
-  String id = prefs.getString("uuid") ?? "id null";
-  String avt = prefs.getString("avt") ?? "avt null";
-  String full_name = prefs.getString("full_name") ?? "full_name null";
-  String phone = prefs.getString("phone") ?? "phone null";
-  String address = prefs.getString("address") ?? "address null";
+  String id = prefs.getString("uuid") ?? "trống";
+  String avt = prefs.getString("avt") ?? "trống";
+  String? full_name = prefs.getString("full_name");
+  String phone = prefs.getString("phone") ?? "trống";
+  String address = prefs.getString("address") ?? "trống";
 
   AccountUsers user = AccountUsers(
     id: id,
@@ -65,3 +65,5 @@ final loadAvatar = FutureProvider<AccountUsers>((ref) async {
 
   return user;
 });
+
+

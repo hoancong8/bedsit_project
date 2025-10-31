@@ -78,25 +78,25 @@ final uploadImagesProvider = FutureProvider.family<List<String>, List<File>>((
 //upload post to db in supabase
 final uploadPost = FutureProvider.family<void, PostModel>((ref, post) async {
 
-  try {
-    await supabase.from('post').insert({
-      'user_id': post.userId,
-      'title': post.title,
-      'description': post.description,
-      'price': post.price,
-      'area': post.area,
-      'address': post.address,
-      'province': post.province,
-      'district': post.district,
-      'ward': post.ward,
-      'images': post.images,
-      'status': post.status,
-      'deposit': post.deposit,
-      'created_at': DateTime.now().toIso8601String(),
-    });
-  } catch (e) {
-    print("lỗi upload post ở đây: ${e.toString()}");
-  }
+    try {
+      await supabase.from('post').insert({
+        'user_id': post.userId,
+        'title': post.title,
+        'description': post.description,
+        'price': post.price,
+        'area': post.area,
+        'address': post.address,
+        'province': post.province,
+        'district': post.district,
+        'ward': post.ward,
+        'images': post.images,
+        'status': post.status,
+        'deposit': post.deposit,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      print("lỗi upload post ở đây: ${e.toString()}");
+    }
 });
 
 //get image to gallery return list file image

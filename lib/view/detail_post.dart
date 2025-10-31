@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:thuetro/utils/utils.dart';
 
 import '../provider/auth_provider.dart';
+import '../provider/chat_provider.dart';
 
 
 class DetailPost extends ConsumerStatefulWidget {
@@ -340,7 +341,6 @@ class _DetailPostState extends ConsumerState<DetailPost> {
           ],
         ),
       ),
-
       // Thanh nút dưới
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(8),
@@ -367,7 +367,14 @@ class _DetailPostState extends ConsumerState<DetailPost> {
                   backgroundColor: Colors.grey[200],
                   foregroundColor: Colors.black,
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  final check = await ref.read(addNewRoomProvider(postUser?["id"]).future);
+
+                  context.push(
+                    '/chatroom',
+                    extra: {'friend': postUser, 'room_id': check.toString()},
+                  );
+                },
                 child: const Text("Chat"),
               ),
             ),

@@ -105,7 +105,7 @@ class _HomeState extends ConsumerState<Home> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    "Xin chào ${data.fullName}",
+                                                    data.fullName!=null?"Xin chào ${data.fullName}":"khách",
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -193,35 +193,50 @@ class _HomeState extends ConsumerState<Home> {
                         Row(
                           children: [
                             const SizedBox(width: 10),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(48),
-                              child: Container(
-                                width: 45,
-                                height: 45,
-                                color: Colors.blue,
-                                child: Image.network(
-                                  url ??
-                                      "https://tse3.mm.bing.net/th/id/OIP.0eDamzEphB4k1QjbE9jAHwHaE7?pid=Api&P=0&h=180",
-                                  fit: BoxFit.cover,
+                            ref.watch(loadAvatar).when(data: (data){
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(48),
+                                child: Container(
+                                  width: 45,
+                                  height: 45,
+                                  color: Colors.blue,
+                                  child: Image.network(
+                                    data.avt ??
+                                        "https://tse3.mm.bing.net/th/id/OIP.0eDamzEphB4k1QjbE9jAHwHaE7?pid=Api&P=0&h=180",
+                                    fit: BoxFit.cover,errorBuilder: (context, error, stackTrace) {
+                                      return Icon(Icons.person_outlined);
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ),
+                              );
+                            }, error: (err, stack) =>
+                                Center(child: Text("Lỗi: $err")),
+                              loading: () => const Center(
+                                child: CircularProgressIndicator(),
+                              ),),
+                            const SizedBox(width: 10),
                             Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                child: const TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Tìm nhanh...",
-                                    prefixIcon: Icon(Icons.search),
-                                    border: InputBorder.none,
+                              child: InkWell(
+                                onTap: (){
+                                  GoRouter.of(context).push("/search");
+                                },
+                                child: Container(
+                                  height: 45,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 12),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("Tìm trọ ..."),
+                                        Icon(Icons.search_outlined),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

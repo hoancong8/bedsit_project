@@ -21,147 +21,152 @@ class _ProfileState extends ConsumerState<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: [
-          const SizedBox(height: 30),
-          CircleAvatar(
-            radius: 40,
-            backgroundImage: NetworkImage(
-              widget.acc["avt"],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 30),
+
+            // Avatar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(48),
+            child: Container(
+              width: 45,
+              height: 45,
+              color: Colors.blue,
+              child: Image.network(
+                widget.acc["avt"] ??
+                    "https://tse3.mm.bing.net/th/id/OIP.0eDamzEphB4k1QjbE9jAHwHaE7?pid=Api&P=0&h=180",
+                fit: BoxFit.cover,errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.person_outlined);
+              },
+              ),
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text(
-              widget.acc["full_name"],
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            // Tên người dùng
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                widget.acc["full_name"],
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Xử lý khi nhấn Follow
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.pinkAccent, // Màu hồng
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-                child: const Text(
-                  'Theo dõi',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              OutlinedButton(
-                onPressed: () {
-                  // Xử lý khi nhấn Message
-                },
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-                child: const Text(
-                  'Nhắn tin',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Người theo dõi 0", style: TextStyle(fontSize: 12)),
-              const SizedBox(width: 10),
-              Text("Đang theo dõi 0", style: TextStyle(fontSize: 12)),
-            ],
-          ),
+            // Nút Theo dõi / Nhắn tin
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pinkAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  child: const Text(
+                    'Theo dõi',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                OutlinedButton(
+                  onPressed: () {
+                    // Chỗ này bạn thêm route chat room sau nhé
+                    GoRouter.of(context).go("/");
+                  },
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.grey.shade200,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  child: const Text(
+                    'Nhắn tin',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text("Bài đã đăng"),
-          ),
-          Expanded(
-            child: ref.watch(selectUserPostProvider(widget.acc["id"]))
-                .when(
+            const SizedBox(height: 8),
+
+            // Dòng mô tả
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text("Người theo dõi 0", style: TextStyle(fontSize: 12)),
+                SizedBox(width: 10),
+                Text("Đang theo dõi 0", style: TextStyle(fontSize: 12)),
+              ],
+            ),
+
+            const Padding(
+              padding: EdgeInsets.all(12.0),
+              child: Text("Bài đã đăng", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+
+
+            ref.watch(selectUserPostProvider(widget.acc["id"])).when(
               data: (data) {
-                print("user id ở đây--: ${widget.acc["id"]} data:$data");
-                if(data.isNotEmpty){
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      // gọi lại provider hoặc API để load dữ liệu mới
-                      ref.refresh(selectUserPostProvider(widget.acc["id"]));
-                    },
-                    child: CustomScrollView(
-                      slivers: [
-                        SliverPadding(
-                          padding: const EdgeInsets.all(8),
-                          sliver: SliverGrid(
-                            gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8,
-                              childAspectRatio: 0.75,
+                if (data.isNotEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Wrap(
+                        alignment: WrapAlignment.start,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: List.generate(data.length, (index) {
+                          final post = data[index];
+                          final imageUrl = (post["images"] != null && post["images"].isNotEmpty)
+                              ? post["images"][0]
+                              : null;
+
+                          return InkWell(
+                            onTap: () {
+                              GoRouter.of(context).push('/detail', extra: post);
+                            },
+                            child: SizedBox(
+                              width: (MediaQuery.of(context).size.width - 8 * 3) / 2,
+                              child: ItemPost(
+                                imageUrl: imageUrl,
+                                title: post["title"]?.toString(),
+                                price: formatMoneyVND(post["price"]),
+                                location: post["address"]?.toString(),
+                                time: timeAgo(post["created_at"]),
+                                id: post["id"].toString(),
+                              ),
                             ),
-                            delegate: SliverChildBuilderDelegate((
-                                ctx,
-                                index,
-                                ) {
-                              final post = data[index];
-
-                              final imageUrl =
-                              (post["images"] != null &&
-                                  post["images"].isNotEmpty)
-                                  ? post["images"][0]
-                                  : null;
-
-                              return InkWell(
-                                onTap: () {
-                                  GoRouter.of(
-                                    context,
-                                  ).push('/detail', extra: post);
-                                },
-                                child: ItemPost(
-                                  imageUrl: imageUrl,
-                                  title: post["title"]?.toString(),
-                                  price: formatMoneyVND(post["price"]),
-                                  location: post["address"]?.toString(),
-                                  time: timeAgo(post["created_at"]),
-                                  id: post["id"].toString(),
-                                ),
-                              );
-                            }, childCount: data.length),
-                          ),
-                        ),
-                      ],
+                          );
+                        }),
+                      ),
                     ),
                   );
-                }
-                else {
-                  return Center(child: Text("Không có bài đăng nào"),);
+                } else {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: Text("Không có bài đăng nào")),
+                  );
                 }
               },
               error: (err, stack) => Center(child: Text("Lỗi: $err")),
-              loading: () => const Center(child: CircularProgressIndicator(),),
+              loading: () => const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Center(child: CircularProgressIndicator()),
+              ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }

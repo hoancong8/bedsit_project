@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:thuetro/utils/utils.dart';
 
 import '../../provider/manager_post_provider.dart';
 
@@ -93,7 +94,7 @@ class _ShowPostState extends ConsumerState<ShowPost> {
                               ),
                             ),
                             Text(
-                              "Giá thuê: ${post["price"]}",
+                              "Giá thuê: ${formatMoneyVND(post["price"])}",
                             ),
                             Text(post["address"]),
                             Text(

@@ -6,25 +6,76 @@ import 'auth_provider.dart';
 
 
 //get list user messenger with you
-final listFriendsChatProvider =
-FutureProvider<List<Map<String, dynamic>>>((
-    ref,
-    ) async {
-  final supabase = Supabase.instance.client;
-  final pref =await SharedPreferences.getInstance();
-  final user = pref.getString("uuid");
-  // gọi query tới Supabase
-  if (user == null) {
-    print("Chưa có UUID — chưa đăng nhập hoặc SharedPreferences chưa load xong");
+// 📦 Lấy danh sách phòng chat mà user hiện tại tham gia
+final listRoomsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  try {
+    final supabase = Supabase.instance.client;
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString("uuid");
+
+    if (userId == null) {
+      print("⚠️ Chưa có UUID — có thể chưa đăng nhập");
+      return [];
+    }
+
+    // 🔍 Lấy danh sách phòng chat mà user đang tham gia
+    final response = await supabase
+        .from('rooms')
+        .select()
+        .contains('user', [userId]) // kiểm tra user có trong mảng users
+        .order('created_at', ascending: false);
+
+    if (response.isEmpty) {
+      print("ℹ️ Chưa có phòng chat nào");
+      return [];
+    }
+
+    return List<Map<String, dynamic>>.from(response);
+  } catch (e) {
+    print("❌ Lỗi khi lấy danh sách phòng: $e");
     return [];
   }
-  final response = await supabase
-      .from('friends_view')
-      .select()
-      .eq('me', user);
-      // .order('created_at', ascending: false);
-  return List<Map<String, dynamic>>.from(response);
 });
+
+
+//check room
+final addNewRoomProvider = FutureProvider.family<String, String>((ref, targetUserId) async {
+  final supabase = Supabase.instance.client;
+  final prefs = await SharedPreferences.getInstance();
+  final currentUserId = prefs.getString("uuid");
+
+  // nếu chưa đăng nhập hoặc target trống
+  if (currentUserId == null || targetUserId.isEmpty) {
+    throw Exception("Thiếu user id hoặc target id");
+  }
+
+  // kiểm tra xem đã có phòng giữa 2 user chưa
+  final existingRooms = await supabase
+      .from('rooms')
+      .select()
+      .contains('user', [currentUserId, targetUserId]);
+
+  if (existingRooms.isNotEmpty) {
+    final roomId = existingRooms.first['id'] as String;
+    print("Phòng đã tồn tại: $roomId");
+    return roomId;
+  }
+
+  // nếu chưa có phòng thì tạo mới
+  final insertResponse = await supabase
+      .from('rooms')
+      .insert({
+    'user': [currentUserId, targetUserId],
+    'name': 'Chat giữa $currentUserId và $targetUserId',
+  })
+      .select()
+      .single();
+
+  final newRoomId = insertResponse['id'] as String;
+  print("Tạo phòng mới: $newRoomId");
+  return newRoomId;
+});
+
 
 
 //get information user

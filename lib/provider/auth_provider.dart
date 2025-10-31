@@ -37,9 +37,7 @@ class AuthController extends StateNotifier<bool> {
   ) async {
     try {
       final res = await supabase.auth.signUp(password: pass, email: email);
-
       await uploadAcc(AccountUsers(id: res.user!.id, account: email, password: pass,phone: phone,fullName: name));
-
       if (res.user != null) {
         return true;
       } else {
@@ -98,7 +96,6 @@ class AuthController extends StateNotifier<bool> {
         prefs.setString("full_name",response["full_name"]??"null".toString());
         prefs.setString("phone",response["phone"]??"null".toString());
         prefs.setString("address",response["address"]??"null".toString());
-
         print("data account login ở đây : ${response}");
         print("pref ở đây: ${prefs.getString("avt")}");
         print("uid ở đây: ${prefs.getString("uuid")}");
@@ -108,7 +105,7 @@ class AuthController extends StateNotifier<bool> {
         ref.invalidate(selectPostProviderApproval("duyệt"));
         ref.invalidate(selectPostProviderApproval("đang duyệt"));
         ref.invalidate(selectPostProviderApproval("từ chối"));
-        ref.invalidate(listFriendsChatProvider);
+        ref.invalidate(listRoomsProvider);
         ref.invalidate(messagesProvider);
         ref.invalidate(getFriendProvider);
         ref.invalidate(authProvider);
@@ -125,6 +122,9 @@ class AuthController extends StateNotifier<bool> {
     }
   }
 
+
+
+
   Future<void> signOut(WidgetRef ref, BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -138,7 +138,7 @@ class AuthController extends StateNotifier<bool> {
     ref.invalidate(selectPostProviderApproval("duyệt"));
     ref.invalidate(selectPostProviderApproval("đang duyệt"));
     ref.invalidate(selectPostProviderApproval("từ chối"));
-    ref.invalidate(listFriendsChatProvider);
+    ref.invalidate(listRoomsProvider);
     ref.invalidate(messagesProvider);
     ref.invalidate(getFriendProvider);
     ref.invalidate(authProvider);
@@ -146,3 +146,5 @@ class AuthController extends StateNotifier<bool> {
   }
 
 }
+
+

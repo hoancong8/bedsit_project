@@ -5,6 +5,9 @@ import 'package:thuetro/view/account.dart';
 import 'package:thuetro/view/chat.dart';
 import 'package:thuetro/view/home/home.dart';
 
+import '../provider/auth_provider.dart';
+import '../provider/chat_provider.dart';
+import '../provider/home_provider.dart';
 import 'manager_post_page/manager_post.dart';
 
 void main() {
@@ -43,6 +46,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   ];
 
   void _selectScreen(int index) {
+    if(index==2){
+      ref.invalidate(listRoomsProvider);
+    }
+    else if(index==0){
+      ref.invalidate(selectPostProvider);
+    }
+
     setState(() {
       _selectedScreenIndex = index;
     });
@@ -67,8 +77,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             height: 45,
             child: FloatingActionButton(
               shape: const CircleBorder(),
-              onPressed: () {
-                GoRouter.of(context).push("/post");
+              onPressed: () async {
+                final result = await ref.read(authInitProvider.future);
+                if(result){
+                  GoRouter.of(context).push("/post");
+                }
+                else{
+                  GoRouter.of(context).push("/sign_in");
+                }
               },
               child: const Icon(Icons.add),
             ),
