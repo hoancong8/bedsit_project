@@ -6,6 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:thuetro/model/post.dart';
 import 'package:thuetro/provider/auth_provider.dart';
 import 'package:thuetro/provider/post_provider.dart';
+import 'package:thuetro/view/FavouritePage.dart';
+import 'package:thuetro/view/HistoryPage.dart';
 import 'package:thuetro/view/bottomappbar.dart';
 import 'package:thuetro/view/chat.dart';
 import 'package:thuetro/view/detail_edit_post.dart';
@@ -97,6 +99,22 @@ class _MyAppState extends ConsumerState<MyApp> {
             final post =
                 state.extra as Map<String, dynamic>; // ép kiểu về object
             return PostUpdate(post: post);
+          },
+        ),
+        GoRoute(
+          path: '/history',
+          builder: (context, state) {
+            final String id =
+                state.extra as String; // ép kiểu về object
+            return HistoryPage(userId: id,);
+          },
+        ),
+        GoRoute(
+          path: '/favourite',
+          builder: (context, state) {
+            final String id =
+            state.extra as String; // ép kiểu về object
+            return FavouritePage(userId: id,);
           },
         ),
         GoRoute(

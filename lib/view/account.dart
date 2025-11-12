@@ -14,6 +14,7 @@ class Account extends ConsumerStatefulWidget {
 }
 
 class _AccountState extends ConsumerState<Account> {
+  String? id;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +25,7 @@ class _AccountState extends ConsumerState<Account> {
                 const SizedBox(height: 60),
 
                 ref.watch(loadAvatar).when(data: (data){
+                  id = data.id;
                   return Column(
                     children: [
                       ClipRRect(
@@ -90,9 +92,11 @@ class _AccountState extends ConsumerState<Account> {
                       children: [
                         ListTile(
                           leading: Icon(Icons.favorite_border),
-                          title: Text("Tin đăng đã lưu"),
+                          title: Text("Tin yêu thích"),
                           trailing: Icon(Icons.chevron_right),
-                          onTap: () {},
+                          onTap: () {
+                            GoRouter.of(context).push("/favourite",extra:id );
+                          },
                         ),
                         ListTile(
                           leading: Icon(Icons.bookmark_border),
@@ -104,7 +108,9 @@ class _AccountState extends ConsumerState<Account> {
                           leading: Icon(Icons.history),
                           title: Text("Lịch sử xem tin"),
                           trailing: Icon(Icons.chevron_right),
-                          onTap: () {},
+                          onTap: () {
+                            GoRouter.of(context).push("/history",extra:id );
+                          },
                         ),
                         ListTile(
                           leading: Icon(Icons.star_border),
