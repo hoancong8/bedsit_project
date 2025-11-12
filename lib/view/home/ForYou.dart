@@ -66,6 +66,7 @@ class _ForyouState extends ConsumerState<Foryou> {
                         location: post["address"]?.toString(),
                         time: timeAgo(post["created_at"]),
                         id: post["id"].toString(),
+                        area: post["area"].toString(),
                       ),
                     );
                   }, childCount: data.length),

@@ -25,7 +25,7 @@ class PostUpdate extends ConsumerStatefulWidget {
   //     ward,
   //     street;
   // List<String>? listImg;
-  PostUpdate({super.key,required this.post});
+  PostUpdate({super.key, required this.post});
 
   @override
   ConsumerState<PostUpdate> createState() => _PostUpdateState();
@@ -33,7 +33,7 @@ class PostUpdate extends ConsumerStatefulWidget {
 
 class _PostUpdateState extends ConsumerState<PostUpdate> {
   List<File> _images = [];
-  List<String> img =[];
+  List<String> img = [];
   String? postId;
   Future<void> _pickImages() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -74,6 +74,7 @@ class _PostUpdateState extends ConsumerState<PostUpdate> {
     super.initState();
     _initPostData();
   }
+
   void _initPostData() {
     final post = widget.post;
     postId = post["id"].toString();
@@ -85,7 +86,21 @@ class _PostUpdateState extends ConsumerState<PostUpdate> {
     areaController.text = post["area"]?.toString() ?? "";
 
     // Gán tình trạng
-    selectStatus = post["status"];
+    // Chuyển status về chữ thường để so sánh
+    final statusFromPost = (post["status"] ?? "").toString().toLowerCase();
+
+    // Tạo list status dạng chữ thường để so sánh
+    final lowerListStatus = listsStatus.map((e) => e.toLowerCase()).toList();
+
+    // Nếu status hợp lệ thì chọn, còn không thì null
+    if (lowerListStatus.contains(statusFromPost)) {
+      // Gán lại đúng giá trị trong danh sách gốc (giữ nguyên chữ hoa, nếu cần)
+      selectStatus = listsStatus.firstWhere(
+        (e) => e.toLowerCase() == statusFromPost,
+      );
+    } else {
+      selectStatus = null;
+    }
 
     // Gán địa chỉ (nếu có)
     address = Address(
@@ -96,12 +111,13 @@ class _PostUpdateState extends ConsumerState<PostUpdate> {
       numberHouse: post["number_house"] ?? "",
       fullPath: post["address"] ?? "",
     );
-    img=List<String>.from(post["images"] ?? []);
+    img = List<String>.from(post["images"] ?? []);
     // Gán hình ảnh (dạng URL từ server)
     // (Dữ liệu server trả về là list URL)
     // Ở phần hiển thị bạn dùng: (widget.post["images"] ?? [])
     // nên ở đây có thể không cần setState.
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -513,7 +529,7 @@ class _PostUpdateState extends ConsumerState<PostUpdate> {
                                 checkPost = false;
                               });
                             }
-                            final allImg = [...list,...img];
+                            final allImg = [...list, ...img];
                             final PostModel post = PostModel(
                               userId: uid ?? "null",
                               title: titleController.text,
@@ -528,18 +544,32 @@ class _PostUpdateState extends ConsumerState<PostUpdate> {
                               province: address?.province ?? "null",
                               status: selectStatus ?? "null",
                               ward: address?.ward ?? "null",
-                              postId:postId
+                              postId: postId,
                             );
+
                             print("post id nè: $postId");
                             print("đang chạy đến 277 ...");
                             // if (checkPost) {
-                              print("post id nè: $postId 11");
-                              await ref.read(uploadPostUpdate(post).future);
+                            print("post id nè: $postId 11");
+                            await ref.read(uploadPostUpdate(post).future);
+                            Navigator.pop(context, {
+                              "title": post.title,
+                              "price": post.price,
+                              "description": post.description,
+                              "area": post.area,
+                              "deposit": post.deposit,
+                              "address": post.address,
+                              "images": post.images,
+                              "status": post.status,
+                              "province": post.province,
+                              "district": post.district,
+                              "ward": post.ward,
+                              "postId": post.postId,
+                            });
                             // }
 
                             // await ref.read(selectPost);
                             print("đang chạy đến 279 ...");
-
                           },
 
                           style: ElevatedButton.styleFrom(

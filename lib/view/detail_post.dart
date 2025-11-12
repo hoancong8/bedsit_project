@@ -182,7 +182,7 @@ class _DetailPostState extends ConsumerState<DetailPost> {
                   Row(
                     children: [
                       Text(
-                        "${formatMoneyVND(widget.post["price"] ?? "2,7 triệu/tháng")}",
+                        "${formatMoneyVND(widget.post["price"])}",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -256,7 +256,7 @@ class _DetailPostState extends ConsumerState<DetailPost> {
                   _buildInfoRow(
                     Icons.key,
                     "Số tiền cọc",
-                    "${formatMoneyVND(widget.post["deposit"] ?? "2.700.000 đ/tháng) ")}",
+                    "${formatMoneyVND(widget.post["deposit"])}",
                   ),
                 ],
               ),

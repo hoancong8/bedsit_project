@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:thuetro/view/post_update.dart';
 
 import '../provider/auth_provider.dart';
 
@@ -345,10 +346,23 @@ class _DetailEditPostState extends ConsumerState<DetailEditPost> {
                   backgroundColor: Colors.grey[200],
                   foregroundColor: Colors.black,
                 ),
-                onPressed: () {
-                  GoRouter.of(context).push("/update_post",extra: widget.post);
-                },
-                child: const Text("Chỉnh sửa bài đăng"),
+                 onPressed: () async {
+                   final updatedPost = await Navigator.push(
+                     context,
+                     MaterialPageRoute(
+                       builder: (_) => PostUpdate(post: widget.post),
+                     ),
+                   );
+
+                   // Nếu trang update trả về dữ liệu mới
+                   if (updatedPost != null) {
+                     setState(() {
+                       widget.post.addAll(updatedPost); // cập nhật lại dữ liệu hiển thị
+                     });
+                   }
+                 },
+
+                 child: const Text("Chỉnh sửa bài đăng"),
                            ),
              ),
     );

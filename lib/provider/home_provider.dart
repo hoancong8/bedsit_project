@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 import 'package:thuetro/model/account.dart';
+import '../utils/location_utils.dart';
 import 'auth_provider.dart';
 
 //get list post of all user
@@ -67,3 +70,57 @@ final loadAvatar = FutureProvider<AccountUsers>((ref) async {
 });
 
 
+
+
+final nearPostProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final supabase = Supabase.instance.client;
+
+  // Lấy vị trí hiện tại của user
+  Position userPosition = await LocationUtils.getCurrentPosition();
+  double myLat = userPosition.latitude;
+  double myLng = userPosition.longitude;
+
+  // Lấy tất cả bài đăng đã duyệt
+  final response = await supabase
+      .from('post')
+      .select()
+      .eq('status_post', "duyệt");
+
+  List<Map<String, dynamic>> posts = List<Map<String, dynamic>>.from(response);
+
+  for (var post in posts) {
+    double? postLat;
+    double? postLng;
+
+    // Nếu lat/lng chưa có, geocode từ ward/district/province
+    String fullAddress = [
+      post['ward'] ?? '',
+      post['district'] ?? '',
+      post['province'] ?? ''
+    ].where((e) => e.isNotEmpty).join(', ');
+
+    if (fullAddress.isNotEmpty) {
+      try {
+        List<Location> locations = await locationFromAddress(fullAddress);
+        if (locations.isNotEmpty) {
+          postLat = locations[0].latitude;
+          postLng = locations[0].longitude;
+        }
+      } catch (e) {
+        postLat = null;
+        postLng = null;
+        print('Lỗi geocode: $e');
+      }
+    }
+    // Tính khoảng cách nếu có tọa độ
+    if (postLat != null && postLng != null) {
+      post['distance'] = Geolocator.distanceBetween(myLat, myLng, postLat, postLng);
+    } else {
+      post['distance'] = 36; // nếu không có tọa độ
+    }
+  }
+  // Sắp xếp theo khoảng cách tăng dần
+  posts.sort((a, b) => (a['distance'] as double).compareTo(b['distance'] as double));
+
+  return posts;
+});

@@ -23,27 +23,35 @@ String formatMoneyVND(num amount) {
   }
 }
 //function format time
-String timeAgo(String dateString) {
-  final dateTime = DateTime.parse(dateString).toLocal();
-  final now = DateTime.now();
-  final difference = now.difference(dateTime);
+String timeAgo(dynamic date) {
+  if (date == null) return "Không xác định";
 
-  if (difference.inSeconds < 60) {
-    return "vừa xong";
-  } else if (difference.inMinutes < 60) {
-    return "${difference.inMinutes} phút trước";
-  } else if (difference.inHours < 24) {
-    return "${difference.inHours} giờ trước";
-  } else if (difference.inDays < 7) {
-    return "${difference.inDays} ngày trước";
-  } else if (difference.inDays < 30) {
-    final weeks = (difference.inDays / 7).floor();
-    return "$weeks tuần trước";
-  } else if (difference.inDays < 365) {
-    final months = (difference.inDays / 30).floor();
-    return "$months tháng trước";
-  } else {
-    final years = (difference.inDays / 365).floor();
-    return "$years năm trước";
+  DateTime parsed;
+  try {
+    if (date is int) {
+      // Epoch milliseconds
+      parsed = DateTime.fromMillisecondsSinceEpoch(date);
+    } else if (date is DateTime) {
+      parsed = date;
+    } else if (date is String) {
+      // Fix lỗi định dạng "2025-11-12 07:30:00"
+      final fixed = date.contains('T') ? date : date.replaceAll(' ', 'T');
+      parsed = DateTime.parse(fixed);
+    } else {
+      return "Không xác định";
+    }
+  } catch (e) {
+    print("⚠️ timeAgo parse error: $e (input: $date)");
+    return "Không xác định";
   }
+
+  final now = DateTime.now();
+  final diff = now.difference(parsed);
+
+  if (diff.inMinutes < 1) return "Vừa xong";
+  if (diff.inHours < 1) return "${diff.inMinutes} phút trước";
+  if (diff.inDays < 1) return "${diff.inHours} giờ trước";
+  if (diff.inDays < 30) return "${diff.inDays} ngày trước";
+  if (diff.inDays < 365) return "${(diff.inDays / 30).floor()} tháng trước";
+  return "${(diff.inDays / 365).floor()} năm trước";
 }

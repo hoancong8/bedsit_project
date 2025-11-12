@@ -8,6 +8,7 @@ import 'package:thuetro/utils/utils.dart';
 import 'package:thuetro/view/home/ForYou.dart';
 import 'package:thuetro/view/home/ItemPost/item_post_vertical.dart';
 import '../../provider/home_provider.dart';
+import 'NearYou.dart';
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -269,7 +270,7 @@ class _HomeState extends ConsumerState<Home> {
           body: TabBarView(
             children: [
               Foryou(),
-              const Center(child: Text("Nội dung Tab 2")),
+              NearMe(),
               const Center(child: Text("Nội dung Tab 3")),
             ],
           ),

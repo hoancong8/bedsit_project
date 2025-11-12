@@ -5,6 +5,8 @@ import 'package:thuetro/provider/auth_provider.dart';
 import 'package:thuetro/provider/chat_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/utils.dart';
+
 class Chat extends ConsumerWidget {
   const Chat({super.key});
 
@@ -77,7 +79,23 @@ class Chat extends ConsumerWidget {
                               ),
                             ),
                             title: Text(friend["full_name"] ?? "Không tên"),
-                            subtitle: Text("Phòng: $roomId"),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  room["last_message"] ?? "Chưa có tin nhắn",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Colors.black54),
+                                ),
+                              ],
+                            ),
+                            trailing: room["last_time"] != null
+                                ? Text(
+                              timeAgo(room["last_time"]),
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            )
+                                : null,
                             onTap: () {
                               print("Vào chat với ${friend["full_name"]} - $roomId");
                               context.push(

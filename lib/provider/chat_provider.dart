@@ -5,8 +5,6 @@ import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 import 'auth_provider.dart';
 
 
-//get list user messenger with you
-// 📦 Lấy danh sách phòng chat mà user hiện tại tham gia
 final listRoomsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
   try {
     final supabase = Supabase.instance.client;
@@ -18,19 +16,36 @@ final listRoomsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async
       return [];
     }
 
-    // 🔍 Lấy danh sách phòng chat mà user đang tham gia
+    // 🔍 Lấy danh sách phòng mà user tham gia
     final response = await supabase
         .from('rooms')
         .select()
-        .contains('user', [userId]) // kiểm tra user có trong mảng users
+        .contains('user', [userId])
         .order('created_at', ascending: false);
 
-    if (response.isEmpty) {
-      print("ℹ️ Chưa có phòng chat nào");
-      return [];
+    final rooms = List<Map<String, dynamic>>.from(response);
+
+    // Lấy tin nhắn cuối cùng cho từng phòng
+    for (final room in rooms) {
+      final roomId = room['id'];
+
+      final lastMsg = await supabase
+          .from('messages')
+          .select('content, sender_id, created_at')
+          .eq('room_id', roomId)
+          .order('created_at', ascending: false)
+          .limit(1);
+
+      if (lastMsg.isNotEmpty) {
+        room['last_message'] = lastMsg.first['content'];
+        room['last_time'] = lastMsg.first['created_at'];
+      } else {
+        room['last_message'] = null;
+        room['last_time'] = null;
+      }
     }
 
-    return List<Map<String, dynamic>>.from(response);
+    return rooms;
   } catch (e) {
     print("❌ Lỗi khi lấy danh sách phòng: $e");
     return [];

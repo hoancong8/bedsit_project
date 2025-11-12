@@ -48,9 +48,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text("Tình trạng nội thất",
-                      style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  const Text(
+                    "Tình trạng nội thất",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
                   ...items.map((e) {
                     return RadioListTile<String>(
                       value: e,
@@ -67,9 +68,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          ref
-                              .read(filterParamsProvider.notifier)
-                              .state = ref
+                          ref.read(filterParamsProvider.notifier).state = ref
                               .read(filterParamsProvider)
                               .copyWith(selectedFurniture: null);
                           setState(() => selectedItem = null);
@@ -121,8 +120,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("Giá thuê",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const Text(
+                "Giá thuê",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -171,8 +172,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   ),
                   const SizedBox(width: 12),
                   ElevatedButton(
-                    style:
-                    ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                    ),
                     onPressed: () {
                       final min = double.tryParse(_minPrice.text) ?? 0;
                       final max = double.tryParse(_maxPrice.text) ?? 10000000;
@@ -193,7 +195,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         );
@@ -217,8 +219,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("Diện tích",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const Text(
+                "Diện tích",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -267,8 +271,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   ),
                   const SizedBox(width: 12),
                   ElevatedButton(
-                    style:
-                    ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                    ),
                     onPressed: () {
                       final min = double.tryParse(_minArea.text) ?? 0;
                       final max = double.tryParse(_maxArea.text) ?? 10000000;
@@ -289,7 +294,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         );
@@ -303,7 +308,42 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     final postAsync = ref.watch(filteredPostsProvider);
 
     return Scaffold(
-      appBar: AppBar( backgroundColor: Colors.white, elevation: 1, titleSpacing: 8, title: Container( height: 40, decoration: BoxDecoration( color: Colors.grey[200], borderRadius: BorderRadius.circular(12), ), child: TextField( controller: _searchController, style: const TextStyle(fontSize: 16), decoration: const InputDecoration( prefixIcon: Icon(Icons.search, color: Colors.grey), hintText: 'Tìm kiếm...', hintStyle: TextStyle(color: Colors.grey), border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 10), ), ), ), actions: [ TextButton( onPressed: () {}, child: const Text( "Tìm kiếm", style: TextStyle(color: Colors.blue, fontSize: 16), ), ), ], ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        titleSpacing: 8,
+        title: Container(
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: TextField(
+            controller: _searchController,
+            style: const TextStyle(fontSize: 16),
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.search, color: Colors.grey),
+              hintText: 'Tìm kiếm...',
+              hintStyle: TextStyle(color: Colors.grey),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(vertical: 10),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Cập nhật search text để provider rebuild
+              ref.read(searchTextProvider.notifier).state = _searchController.text;
+            },
+            child: const Text(
+              "Tìm kiếm",
+              style: TextStyle(color: Colors.blue, fontSize: 16),
+            ),
+          ),
+
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -323,7 +363,19 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Row( mainAxisSize: MainAxisSize.min, children: [ Icon(Icons.filter_list_outlined), Text( priceLabel ?? "Giá thuê", style: const TextStyle(color: Colors.black87, fontSize: 16), ), ], ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.filter_list_outlined),
+                      Text(
+                        priceLabel ?? "Giá thuê",
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: _showArea,
@@ -336,7 +388,19 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Row( mainAxisSize: MainAxisSize.min, children: [ Icon(Icons.filter_list_outlined), Text( areaLabel ?? "Diện tích", style: const TextStyle(color: Colors.black87, fontSize: 16), ), ], ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.filter_list_outlined),
+                      Text(
+                        areaLabel ?? "Diện tích",
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: _showFilterPopup,
@@ -349,7 +413,19 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Row( mainAxisSize: MainAxisSize.min, children: [ Icon(Icons.filter_list_outlined), Text( selectedItem ?? "tình trạng nội thất", style: const TextStyle(color: Colors.black87, fontSize: 16), ), ], ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.filter_list_outlined),
+                      Text(
+                        selectedItem ?? "tình trạng nội thất",
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -358,13 +434,21 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               child: postAsync.when(
                 data: (posts) {
                   if (posts.isEmpty) {
-                    return const Center(child: Text("Không có bài đăng phù hợp"));
+                    return const Center(
+                      child: Text("Không có bài đăng phù hợp"),
+                    );
                   }
                   return ListView.builder(
                     itemCount: posts.length,
                     itemBuilder: (context, index) {
                       final post = posts[index];
-                      return ItemPostHorizontal(imageUrl: post["images"][0],title: post["title"],location: post["address"],time: post["created_at"],price:formatMoneyVND(post["price"]) ,);
+                      return ItemPostHorizontal(
+                        imageUrl: post["images"][0],
+                        title: post["title"],
+                        location: post["address"],
+                        time: post["created_at"],
+                        price: formatMoneyVND(post["price"]),
+                      );
                     },
                   );
                 },
