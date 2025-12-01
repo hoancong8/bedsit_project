@@ -78,6 +78,7 @@ final uploadImagesProvider = FutureProvider.family<List<String>, List<File>>((
 //upload post to db in supabase
 final uploadPost = FutureProvider.family<void, PostModel>((ref, post) async {
 
+
     try {
       await supabase.from('post').insert({
         'user_id': post.userId,

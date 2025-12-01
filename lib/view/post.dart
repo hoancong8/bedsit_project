@@ -155,10 +155,12 @@ class _PostState extends ConsumerState<Post> {
                           spacing: 8,
                           runSpacing: 8,
                           children: _images.map((file) {
-                            return Column(
+                            return Stack(
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(
+                                    8,
+                                  ),
                                   child: Image.file(
                                     file,
                                     width: 100,
@@ -166,15 +168,42 @@ class _PostState extends ConsumerState<Post> {
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    await ref.watch(
-                                      uploadImagesProvider(_images),
-                                    );
-                                    // print("url ở đây : $a");
-                                  },
-                                  child: Text("test upload"),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _images.remove(file);
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(
+                                          0.5,
+                                        ),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      padding: const EdgeInsets.all(4),
+                                      child: const Icon(
+                                        Icons.close,
+                                        size: 18,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
+                                // Positioned(
+                                //   bottom: 4,
+                                //   left: 0,
+                                //   right: 0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       await ref.watch(uploadImagesProvider(_images));
+                                //     },
+                                //     child: const Text("test upload"),
+                                //   ),
+                                // ),
                               ],
                             );
                           }).toList(),
