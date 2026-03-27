@@ -20,8 +20,6 @@ class Post extends ConsumerStatefulWidget {
 class _PostState extends ConsumerState<Post> {
   List<File> _images = [];
 
-
-
   String? selectStatus;
   Address? address;
   final areaController = TextEditingController();
@@ -29,7 +27,12 @@ class _PostState extends ConsumerState<Post> {
   final titleController = TextEditingController();
   final priceController = TextEditingController();
   final descriptionController = TextEditingController();
-  String? errorTitle,errorAddress,errorDeposit,errorPrice,errorDescription,errorArea;
+  String? errorTitle,
+      errorAddress,
+      errorDeposit,
+      errorPrice,
+      errorDescription,
+      errorArea;
 
   // Post _post = Post()
   List<String> listsStatus = [
@@ -47,381 +50,482 @@ class _PostState extends ConsumerState<Post> {
     priceController.dispose();
     depositCotroller.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text("Đăng tin"),
+        title: const Text("Đăng tin"),
         centerTitle: true,
-
         actions: [
           TextButton(
             onPressed: () {},
-
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-
-              // padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: Text("lưu nháp"),
+            child: const Text(
+              "Lưu nháp",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           const SizedBox(width: 8),
         ],
       ),
-      body: ref.watch(loggedInProvider.notifier).state?Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("ĐỊA CHỈ VÀ HÌNH ẢNH"),
-              const SizedBox(height: 6),
-              InkWell(
-                onTap: () async {
-                  final fullAddress = await showModalBottomSheet<Address>(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
+      body: ref.watch(loggedInProvider.notifier).state
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "ĐỊA CHỈ VÀ HÌNH ẢNH",
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    builder: (context) {
-                      return AddressBottomSheet();
-                    },
-                  );
-                  if (fullAddress != null) {
-                    print("địa chỉ : ${fullAddress.toString()}");
-                    setState(() {
-                      address = fullAddress;
-                      errorAddress=null;
-                    });
-                  }
+                    const SizedBox(height: 8),
 
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(left: 10),
-                  width: double.infinity,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all( color:errorAddress!=null?Colors.red: Colors.grey, width: 1),
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child:
-                    errorAddress!=null?
-                        Text(errorAddress!,style: TextStyle(color: Colors.red),):
-                    Text(
-                      address==null?"Địa chỉ":address.toString(),
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-              _images.isEmpty
-                  ? InkWell(
-                      onTap: (){
-                        setState(()  async {
-                          _images = await pickImages();
-                        });
+                    // Address selector
+                    InkWell(
+                      onTap: () async {
+                        final fullAddress = await showModalBottomSheet<Address>(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20),
+                            ),
+                          ),
+                          builder: (context) {
+                            return const AddressBottomSheet();
+                          },
+                        );
+                        if (fullAddress != null) {
+                          setState(() {
+                            address = fullAddress;
+                            errorAddress = null;
+                          });
+                        }
                       },
                       child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         width: double.infinity,
-                        height: 100,
+                        height: 52,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey, width: 1),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: errorAddress != null
+                                ? Colors.red
+                                : Colors.grey,
+                            width: 1,
+                          ),
+                          color: Colors.white,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.camera_alt_outlined),
-                            Text("chọn ảnh"),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                errorAddress != null
+                                    ? errorAddress!
+                                    : (address == null
+                                          ? "Chọn địa chỉ"
+                                          : address.toString()),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: address == null
+                                      ? Colors.grey.shade700
+                                      : Colors.black87,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Icon(Icons.keyboard_arrow_down),
                           ],
                         ),
                       ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _images.map((file) {
-                            return Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                    8,
-                                  ),
-                                  child: Image.file(
-                                    file,
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                  ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Images area
+                    const Text(
+                      "Hình ảnh",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    _images.isEmpty
+                        ? GestureDetector(
+                            onTap: () async {
+                              final imgs = await pickImages();
+                              setState(() {
+                                _images = imgs;
+                              });
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                  width: 1,
                                 ),
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: InkWell(
-                                    onTap: () {
+                                color: Colors.grey.shade50,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Icon(
+                                    Icons.camera_alt_outlined,
+                                    size: 32,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(height: 6),
+                                  Text("Chọn ảnh (tối thiểu 1)"),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 8,
+                                      childAspectRatio: 1,
+                                    ),
+                                itemCount: _images.length,
+                                itemBuilder: (context, idx) {
+                                  final file = _images[idx];
+                                  return Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(
+                                          file,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 6,
+                                        right: 6,
+                                        child: InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              _images.removeAt(idx);
+                                            });
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.black54,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              size: 16,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () async {
+                                      final imgs = await pickImages();
                                       setState(() {
-                                        _images.remove(file);
+                                        _images.addAll(imgs);
                                       });
                                     },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(
-                                          0.5,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      padding: const EdgeInsets.all(4),
-                                      child: const Icon(
-                                        Icons.close,
-                                        size: 18,
-                                        color: Colors.white,
-                                      ),
+                                    icon: const Icon(Icons.add),
+                                    label: const Text("Thêm ảnh"),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _images = [];
+                                      });
+                                    },
+                                    child: const Text(
+                                      'Xoá tất cả',
+                                      style: TextStyle(color: Colors.red),
                                     ),
                                   ),
-                                ),
-                                // Positioned(
-                                //   bottom: 4,
-                                //   left: 0,
-                                //   right: 0,
-                                //   child: ElevatedButton(
-                                //     onPressed: () async {
-                                //       await ref.watch(uploadImagesProvider(_images));
-                                //     },
-                                //     child: const Text("test upload"),
-                                //   ),
-                                // ),
-                              ],
-                            );
-                          }).toList(),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                    const SizedBox(height: 16),
+                    const Text(
+                      "THÔNG TIN KHÁC",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Status dropdown
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                          width: 1,
                         ),
-                        const SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          onPressed: (){
-                            setState(() async{
-                              _images = await pickImages();
-                            });
-                          },
-                          icon: const Icon(Icons.add),
-                          label: const Text("Thêm ảnh"),
+                        color: Colors.white,
+                      ),
+                      child: DropdownButtonFormField<String>(
+                        value: selectStatus,
+                        items: listsStatus
+                            .map(
+                              (status) => DropdownMenuItem(
+                                value: status,
+                                child: Text(status),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (val) => setState(() => selectStatus = val),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Tình trạng nội thất",
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    const Text(
+                      "DIỆN TÍCH & GIÁ",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+
+                    textfieldPost(
+                      "Diện tích",
+                      TextInputType.number,
+                      areaController,
+                      errorArea,
+                      (value) {
+                        setState(() {
+                          errorArea = null;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    textfieldPost(
+                      "Giá thuê",
+                      TextInputType.number,
+                      priceController,
+                      errorPrice,
+                      (value) {
+                        setState(() {
+                          errorPrice = null;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    textfieldPost(
+                      "Tiền cọc",
+                      TextInputType.number,
+                      depositCotroller,
+                      errorDeposit,
+                      (value) {
+                        setState(() {
+                          errorDeposit = null;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+                    const Text(
+                      "TIÊU ĐỀ TIN ĐĂNG VÀ MÔ TẢ CHI TIẾT",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    textfieldPost(
+                      "Tiêu đề tin đăng",
+                      TextInputType.text,
+                      titleController,
+                      errorTitle,
+                      (value) {
+                        setState(() {
+                          errorTitle = null;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: descriptionController,
+                      minLines: 8,
+                      maxLines: 12,
+                      decoration: InputDecoration(
+                        hintText: "Mô tả chi tiết về phòng/trọ...",
+                        errorText: errorDescription,
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Colors.blue,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          errorDescription = null;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {},
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Colors.grey.shade300),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            child: const Text(
+                              "XEM TRƯỚC TIN",
+                              style: TextStyle(color: Colors.black87),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              bool checkPost = true;
+                              List<String> list = await ref.read(
+                                uploadImagesProvider(_images).future,
+                              );
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              final uid = await prefs.getString("uuid");
+
+                              if (titleController.text.isEmpty) {
+                                setState(() {
+                                  errorTitle = "không được để trống";
+                                  checkPost = false;
+                                });
+                              }
+                              if (double.tryParse(priceController.text) ==
+                                  null) {
+                                setState(() {
+                                  errorPrice = "không được để trống";
+                                  checkPost = false;
+                                });
+                              }
+                              if (address == null) {
+                                setState(() {
+                                  errorAddress = "không được để trống";
+                                  checkPost = false;
+                                });
+                              }
+                              if (list.isEmpty) {
+                                checkPost = false;
+                              }
+                              if (descriptionController.text.isEmpty) {
+                                setState(() {
+                                  checkPost = false;
+                                  errorDescription = "không được để trống";
+                                });
+                              }
+                              if (double.tryParse(areaController.text) ==
+                                  null) {
+                                setState(() {
+                                  errorArea =
+                                      "không được để trống hoặc ghi chữ";
+                                  checkPost = false;
+                                });
+                              }
+                              if (double.tryParse(depositCotroller.text) ==
+                                  null) {
+                                setState(() {
+                                  errorDeposit = "không được để trống";
+                                  checkPost = false;
+                                });
+                              }
+                              final PostModel post = PostModel(
+                                userId: uid ?? "null",
+                                title: titleController.text,
+                                price:
+                                    double.tryParse(priceController.text) ?? 0,
+                                address: address.toString() ?? "",
+                                images: list,
+                                description: descriptionController.text,
+                                area: double.tryParse(areaController.text) ?? 0,
+                                deposit:
+                                    double.tryParse(depositCotroller.text) ?? 0,
+                                district: address?.district ?? "null",
+                                province: address?.province ?? "null",
+                                status: selectStatus ?? "null",
+                                ward: address?.ward ?? "null",
+                              );
+                              if (checkPost) {
+                                await ref.read(uploadPost(post).future);
+                              }
+
+                              print("đang chạy đến 279 ...");
+                            },
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              backgroundColor: Colors.blue,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            child: const Text(
+                              "ĐĂNG TIN",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-              const SizedBox(height: 15),
-              Text("THÔNG TIN KHÁC"),
-              const SizedBox(height: 6),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 5),
-                width: 200,
-                // height: 50,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey, width: 1),
-                ),
-                child: DropdownButtonFormField<String>(
-                  value: selectStatus,
-                  items: listsStatus
-                      .map(
-                        (status) => DropdownMenuItem(
-                          value: status,
-                          child: Text(status),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (val) {
-                    setState(() => selectStatus = val);
-                  },
-                  decoration: const InputDecoration(
-                    hintText: "Tình trạng nội thất",
-                    border: InputBorder.none, // bỏ gạch dưới
-                    enabledBorder: InputBorder.none, // bỏ khi chưa focus
-                    focusedBorder: InputBorder.none,
-                  ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
               ),
-              const SizedBox(height: 15),
-              Text("DIỆN TÍCH & GIÁ"),
-              const SizedBox(height: 6),
-              textfieldPost("Diện tích", TextInputType.number, areaController,errorArea,(value){
-                setState(() {
-                  errorArea=null;
-                });
-              }),
-              const SizedBox(height: 15),
-              textfieldPost("Giá thuê", TextInputType.number, priceController,errorPrice,(value){
-                setState(() {
-                  errorPrice=null;
-                });
-              }),
-              const SizedBox(height: 15),
-              textfieldPost("Tiền cọc", TextInputType.number, depositCotroller,errorDeposit,(value){
-                setState(() {
-                  errorDeposit=null;
-                });
-              }),
-              const SizedBox(height: 15),
-              Text("TIÊU ĐỀ TIN ĐĂNG VÀ MÔ TẢ CHI TIẾT"),
-              const SizedBox(height: 10),
-              textfieldPost(
-                "Tiêu đề tin đăng",
-                TextInputType.text,
-                titleController,
-                errorTitle,
-                      (value){
-                  setState(() {
-                    errorTitle=null;
-                  });
-                  }
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: descriptionController,
-                minLines: 10,
-                maxLines: 11,
-                decoration: InputDecoration(
-                  label: Text("Tiêu đề tin đăng"),
-                  hint: Text("data"),
-                  errorText: errorDescription,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8), // bo góc
-                    borderSide: BorderSide(color: Colors.grey, width: 1),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(
-                      color: Colors.blue, // màu khi focus
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-                onChanged: (value){
-                  setState(() {
-                    errorDescription=null;
-                  });
+            )
+          : Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  GoRouter.of(context).go("/");
                 },
+                child: const Text("Đăng nhập"),
               ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                children: [
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        side: BorderSide(color: Colors.grey, width: 1),
-                      ),
-                    ),
-                    child: Text("XEM TRƯỚC TIN"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      bool checkPost=true;
-                      List<String> list = await ref.read(uploadImagesProvider(_images).future);
-                      final prefs = await SharedPreferences.getInstance();
-                      final uid = await prefs.getString("uuid");
-
-                      if(titleController.text.isEmpty){
-                        setState(() {
-                          errorTitle="không được để trống";
-                          checkPost=false;
-                        });
-                      }
-                      if(double.tryParse(priceController.text)==null){
-                        setState(() {
-                          errorPrice="không được để trống";
-                          checkPost=false;
-                        });
-                      }
-                      if(address==null){
-                        setState(() {
-                          errorAddress="không được để trống";
-                          checkPost=false;
-                        });
-                      }
-                      if(list.isEmpty){
-                        // setState(() {
-                        //
-                        // });
-                        checkPost=false;
-                      }
-                      if(descriptionController.text.isEmpty){
-                        setState(() {
-                          checkPost=false;
-                          errorDescription="không được để trống";
-                        });
-                      }
-                      if(double.tryParse(areaController.text)==null){
-                        setState(() {
-                          errorArea="không được để trống hoặc ghi chữ";
-                          checkPost=false;
-                        });
-                      }
-                      if(double.tryParse(depositCotroller.text)==null){
-                        setState(() {
-                          errorDeposit="không được để trống";
-                          checkPost=false;
-                        });
-                      }
-                      final PostModel post = PostModel(
-                        userId: uid??"null",
-                        title: titleController.text,
-                        price: double.tryParse(priceController.text) ?? 0,
-                        address: address.toString()??"",
-                        images:list,
-                        description: descriptionController.text,
-                        area: double.tryParse(areaController.text) ?? 0,
-                        deposit: double.tryParse(depositCotroller.text) ?? 0,
-                        district: address?.district??"null",
-                        province: address?.province??"null",
-                        status: selectStatus??"null",
-                        ward: address?.ward??"null",
-                      );
-                      if(checkPost){
-                        await ref.read(uploadPost(post).future);
-                      }
-
-
-                      // await ref.read(selectPost);
-                      print("đang chạy đến 279 ...");
-                    },
-
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      backgroundColor: Colors.blue,
-                    ),
-                    child: Text(
-                      "ĐĂNG TIN",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ):Center(
-        child:
-        ElevatedButton(onPressed: (){
-          GoRouter.of(context).go("/");
-        }, child: Text("Đăng nhập")),
-      ),
+            ),
     );
   }
 }
@@ -430,27 +534,26 @@ Widget textfieldPost(
   String label,
   TextInputType a,
   TextEditingController textController,
-    String? error,
-    void Function(String)? onChanged
+  String? error,
+  void Function(String)? onChanged,
 ) {
   return TextField(
     controller: textController,
     keyboardType: a,
     decoration: InputDecoration(
-      label: Text(label),
+      labelText: label,
       errorText: error,
+      filled: true,
+      fillColor: Colors.grey.shade50,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8), // bo góc
-        borderSide: BorderSide(color: Colors.grey, width: 1),
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide.none,
       ),
-
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(
-          color: Colors.blue, // màu khi focus
-          width: 1.5,
-        ),
+        borderSide: BorderSide(color: Colors.blue, width: 1.5),
       ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
     ),
     onChanged: onChanged,
   );
@@ -481,9 +584,7 @@ class _AddressBottomSheetState extends ConsumerState<AddressBottomSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(
-          context,
-        ).viewInsets.bottom, //tránh bàn phím che
+        bottom: MediaQuery.of(context).viewInsets.bottom, //tránh bàn phím che
       ),
       child: SingleChildScrollView(
         child: Column(
